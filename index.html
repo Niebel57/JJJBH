@@ -376,6 +376,20 @@
             <input type="number" id="age" placeholder="Âge" min="0" max="120">
           </div>
           <div class="form-group">
+            <label>Catégorie</label>
+            <select id="categorie">
+              <option value="">-</option>
+              <option value="Mini-Poussin">Mini-Poussin (4-5 ans)</option>
+              <option value="Poussin">Poussin (6-7 ans)</option>
+              <option value="Pupille">Pupille (8-9 ans)</option>
+              <option value="Minime">Minime (10-11 ans)</option>
+              <option value="Cadet">Cadet (12-14 ans)</option>
+              <option value="Junior">Junior (15-17 ans)</option>
+              <option value="Senior">Senior (18-34 ans)</option>
+              <option value="Vétéran">Vétéran (35 ans et +)</option>
+            </select>
+          </div>
+          <div class="form-group">
             <label>Poids (kg)</label>
             <input type="number" id="poids" placeholder="Poids" min="0" step="0.1">
           </div>
@@ -429,7 +443,7 @@
           <input type="file" id="csvFile" accept=".csv,text/csv" style="display:none;" onchange="importCSV(event)">
         </div>
         <div class="info-note">
-          <strong>Format CSV :</strong> Prénom ; Nom ; Sexe ; Discipline ; Date de naissance (AAAA-MM-JJ) ; Âge ; Poids ; Ceinture ; Adresse ; Code postal ; Téléphone ; Email ; Commentaires
+          <strong>Format CSV :</strong> Prénom ; Nom ; Sexe ; Discipline ; Date de naissance (AAAA-MM-JJ) ; Âge ; Catégorie ; Poids ; Ceinture ; Adresse ; Code postal ; Téléphone ; Email ; Commentaires
         </div>
         <div id="listeEleves"></div>
       </div>
@@ -558,6 +572,20 @@
         <input type="number" id="editAge" min="0" max="120">
       </div>
       <div class="form-group">
+        <label>Catégorie</label>
+        <select id="editCategorie">
+          <option value="">-</option>
+          <option value="Mini-Poussin">Mini-Poussin (4-5 ans)</option>
+          <option value="Poussin">Poussin (6-7 ans)</option>
+          <option value="Pupille">Pupille (8-9 ans)</option>
+          <option value="Minime">Minime (10-11 ans)</option>
+          <option value="Cadet">Cadet (12-14 ans)</option>
+          <option value="Junior">Junior (15-17 ans)</option>
+          <option value="Senior">Senior (18-34 ans)</option>
+          <option value="Vétéran">Vétéran (35 ans et +)</option>
+        </select>
+      </div>
+      <div class="form-group">
         <label>Poids (kg)</label>
         <input type="number" id="editPoids" min="0" step="0.1">
       </div>
@@ -665,6 +693,20 @@ let syncInProgress = false;
 let realtimeChannel = null;
 let pendingImport = null;
 let editingEleveId = null;
+
+// FONCTION POUR DÉTERMINER LA CATÉGORIE D'ÂGE SELON L'ANNÉE DE NAISSANCE
+function getCategorieAge(age) {
+  if (!age || isNaN(age)) return '';
+  if (age >= 4 && age <= 5) return 'Mini-Poussin';
+  if (age >= 6 && age <= 7) return 'Poussin';
+  if (age >= 8 && age <= 9) return 'Pupille';
+  if (age >= 10 && age <= 11) return 'Minime';
+  if (age >= 12 && age <= 14) return 'Cadet';
+  if (age >= 15 && age <= 17) return 'Junior';
+  if (age >= 18 && age <= 34) return 'Senior';
+  if (age >= 35) return 'Vétéran';
+  return '';
+}
 
 async function loadFromCloud() {
   setCloudStatus('syncing', 'Chargement...');
@@ -826,7 +868,12 @@ function calcAge() {
   let age = today.getFullYear() - birth.getFullYear();
   const m = today.getMonth() - birth.getMonth();
   if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) age--;
+  
   document.getElementById('age').value = age;
+  
+  // Auto-remplissage de la catégorie
+  const cat = getCategorieAge(age);
+  if (cat) document.getElementById('categorie').value = cat;
 }
 
 function normalizeName(s) {
@@ -852,6 +899,7 @@ async function addEleve() {
     discipline: document.getElementById('discipline').value,
     naissance: document.getElementById('naissance').value,
     age: document.getElementById('age').value,
+    categorie: document.getElementById('categorie').value,
     poids: document.getElementById('poids').value,
     ceinture: document.getElementById('ceinture').value,
     adresse: document.getElementById('adresse').value.trim(),
@@ -865,6 +913,7 @@ async function addEleve() {
   document.getElementById('ceinture').value = 'Blanche';
   document.getElementById('sexe').value = '';
   document.getElementById('discipline').value = 'Judo';
+  document.getElementById('categorie').value = '';
   renderAll();
   alert(`✅ Élève ${prenom} ${nom} ajouté !`);
 }
@@ -886,6 +935,7 @@ function editEleve(id) {
   document.getElementById('editDiscipline').value = e.discipline || 'Judo';
   document.getElementById('editNaissance').value = e.naissance || '';
   document.getElementById('editAge').value = e.age || '';
+  document.getElementById('editCategorie').value = e.categorie || '';
   document.getElementById('editPoids').value = e.poids || '';
   document.getElementById('editCeinture').value = e.ceinture || 'Blanche';
   document.getElementById('editAdresse').value = e.adresse || '';
@@ -904,7 +954,12 @@ function calcEditAge() {
   let age = today.getFullYear() - birth.getFullYear();
   const m = today.getMonth() - birth.getMonth();
   if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) age--;
+  
   document.getElementById('editAge').value = age;
+  
+  // Auto-remplissage de la catégorie
+  const cat = getCategorieAge(age);
+  if (cat) document.getElementById('editCategorie').value = cat;
 }
 
 function closeEditModal() {
@@ -927,6 +982,7 @@ async function saveEditEleve() {
   e.discipline = document.getElementById('editDiscipline').value;
   e.naissance = document.getElementById('editNaissance').value;
   e.age = document.getElementById('editAge').value;
+  e.categorie = document.getElementById('editCategorie').value;
   e.poids = document.getElementById('editPoids').value;
   e.ceinture = document.getElementById('editCeinture').value;
   e.adresse = document.getElementById('editAdresse').value.trim();
@@ -948,7 +1004,7 @@ function renderEleves() {
   const filterDisc = document.getElementById('filterDiscipline').value;
   
   const filtered = eleves.filter(e => {
-    const haystack = `${e.prenom} ${e.nom} ${e.sexe||''} ${e.adresse||''} ${e.codePostal||''} ${e.telephone||''} ${e.email||''}`.toLowerCase();
+    const haystack = `${e.prenom} ${e.nom} ${e.sexe||''} ${e.adresse||''} ${e.codePostal||''} ${e.telephone||''} ${e.email||''} ${e.categorie||''}`.toLowerCase();
     const matchSearch = haystack.includes(search);
     const matchDisc = filterDisc === '' || e.discipline === filterDisc;
     return matchSearch && matchDisc;
@@ -961,7 +1017,7 @@ function renderEleves() {
   }
   
   let html = `<table class="mobile-cards"><thead><tr>
-    <th>Prénom</th><th>Nom</th><th>Sexe</th><th>Discipline</th><th>Naissance</th><th>Âge</th>
+    <th>Prénom</th><th>Nom</th><th>Sexe</th><th>Discipline</th><th>Catégorie</th><th>Naissance</th><th>Âge</th>
     <th>Poids</th><th>Ceinture</th><th>Contact</th><th>Adresse</th><th>Commentaires</th><th>Actions</th>
   </tr></thead><tbody>`;
   
@@ -971,12 +1027,14 @@ function renderEleves() {
     if (e.email) contact.push(`✉️ ${esc(e.email)}`);
     const adresse = [e.adresse ? esc(e.adresse) : '', e.codePostal ? esc(e.codePostal) : ''].filter(Boolean).join(' ');
     const discBadge = e.discipline ? `<span style="background:rgba(255,255,255,0.1);color:#e2e8f0;padding:4px 10px;border-radius:6px;font-size:12px;font-weight:600;border:1px solid rgba(255,255,255,0.1);">${esc(e.discipline)}</span>` : '-';
+    const catBadge = e.categorie ? `<span style="background:rgba(59,130,246,0.2);color:#93c5fd;padding:4px 10px;border-radius:6px;font-size:12px;font-weight:600;border:1px solid rgba(59,130,246,0.3);">${esc(e.categorie)}</span>` : '-';
 
     html += `<tr>
       <td data-label="Prénom">${esc(e.prenom)}</td>
       <td data-label="Nom">${esc(e.nom)}</td>
       <td data-label="Sexe">${e.sexe === 'Homme' ? '♂️ Homme' : e.sexe === 'Femme' ? '♀️ Femme' : '-'}</td>
       <td data-label="Discipline">${discBadge}</td>
+      <td data-label="Catégorie">${catBadge}</td>
       <td data-label="Naissance">${e.naissance || '-'}</td>
       <td data-label="Âge">${e.age || '-'}</td>
       <td data-label="Poids">${e.poids ? esc(e.poids) + ' kg' : '-'}</td>
@@ -1220,7 +1278,7 @@ function importCSV(event) {
 
     const delim = detectDelimiter(lines[0]);
     const firstCells = parseCSVLine(lines[0], delim).map(normalizeHeader);
-    const headerKeys = ['prenom','nom','sexe','discipline','naissance','datedenaissance','age','poids','ceinture','adresse','codepostal','telephone','tel','email','mail','commentaires','commentaire'];
+    const headerKeys = ['prenom','nom','sexe','discipline','categorie','naissance','datedenaissance','age','poids','ceinture','adresse','codepostal','telephone','tel','email','mail','commentaires','commentaire'];
     const hasHeader = firstCells.some(c => headerKeys.includes(c));
 
     const dataLines = hasHeader ? lines.slice(1) : lines;
@@ -1237,12 +1295,13 @@ function importCSV(event) {
       if (cells.every(c => c === '')) return;
       const lineNum = idx + (hasHeader ? 2 : 1);
 
-      let prenom, nom, sexe, discipline, naissance, age, poids, ceinture, adresse, codePostal, telephone, email, commentaires;
+      let prenom, nom, sexe, discipline, categorie, naissance, age, poids, ceinture, adresse, codePostal, telephone, email, commentaires;
       if (hasHeader) {
         prenom = cells[headerMap['prenom']] || '';
         nom = cells[headerMap['nom']] || '';
         sexe = cells[headerMap['sexe']] || '';
         discipline = cells[headerMap['discipline']] || '';
+        categorie = cells[headerMap['categorie']] || '';
         naissance = cells[headerMap['naissance']] || cells[headerMap['datedenaissance']] || '';
         age = cells[headerMap['age']] || '';
         poids = cells[headerMap['poids']] || '';
@@ -1253,7 +1312,7 @@ function importCSV(event) {
         email = cells[headerMap['email']] || cells[headerMap['mail']] || '';
         commentaires = cells[headerMap['commentaires']] || cells[headerMap['commentaire']] || '';
       } else {
-        [prenom, nom, sexe, discipline, naissance, age, poids, ceinture, adresse, codePostal, telephone, email, commentaires] = cells;
+        [prenom, nom, sexe, discipline, categorie, naissance, age, poids, ceinture, adresse, codePostal, telephone, email, commentaires] = cells;
       }
 
       if (!prenom || !nom) { warnings.push(`Ligne ${lineNum} : Prénom/Nom manquant → ignorée`); return; }
@@ -1291,9 +1350,15 @@ function importCSV(event) {
         if (mo < 0 || (mo === 0 && today.getDate() < birth.getDate())) a--;
         age = a;
       }
+      
+      // Auto-catégorie si vide
+      if (!categorie && age) {
+        categorie = getCategorieAge(parseInt(age));
+      }
+
       parsed.push({
         id: Date.now() + Math.random(),
-        prenom, nom, sexe, discipline, naissance,
+        prenom, nom, sexe, discipline, categorie, naissance,
         age: age || '',
         poids: poids ? poids.replace(',', '.').replace(/[^\d.]/g,'') : '',
         ceinture,
@@ -1357,9 +1422,9 @@ async function finalizeImport(newEleves, warnings, skippedDup) {
 
 function downloadCSVTemplate() {
   const csv = "\uFEFF" +
-    "Prénom;Nom;Sexe;Discipline;Date de naissance;Âge;Poids;Ceinture;Adresse;Code postal;Téléphone;Email;Commentaires\n" +
-    "Jean;Dupont;Homme;Judo;2010-05-12;15;45;Jaune;12 rue de la Paix;57970;0612345678;jean@exemple.fr;Débutant motivé\n" +
-    "Marie;Martin;Femme;Jujitsu;2005-09-23;20;58;Verte;5 avenue du Club;57970;0698765432;marie@exemple.fr;-\n";
+    "Prénom;Nom;Sexe;Discipline;Catégorie;Date de naissance;Âge;Poids;Ceinture;Adresse;Code postal;Téléphone;Email;Commentaires\n" +
+    "Jean;Dupont;Homme;Judo;Poussin;2018-05-12;6;20;Jaune;12 rue de la Paix;57970;0612345678;jean@exemple.fr;Débutant motivé\n" +
+    "Marie;Martin;Femme;Jujitsu;Senior;2005-09-23;19;58;Verte;5 avenue du Club;57970;0698765432;marie@exemple.fr;-\n";
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -1371,7 +1436,7 @@ function downloadCSVTemplate() {
 
 function exportCSV() {
   if (eleves.length === 0) { alert("Aucun élève à exporter."); return; }
-  const headers = ['Prénom','Nom','Sexe','Discipline','Date de naissance','Âge','Poids','Ceinture','Adresse','Code postal','Téléphone','Email','Commentaires'];
+  const headers = ['Prénom','Nom','Sexe','Discipline','Catégorie','Date de naissance','Âge','Poids','Ceinture','Adresse','Code postal','Téléphone','Email','Commentaires'];
   const escCSV = v => {
     v = (v === undefined || v === null) ? '' : String(v);
     if (v.includes(';') || v.includes('"') || v.includes('\n')) return '"' + v.replace(/"/g, '""') + '"';
@@ -1379,7 +1444,7 @@ function exportCSV() {
   };
   let csv = "\uFEFF" + headers.join(';') + '\n';
   eleves.forEach(e => {
-    csv += [e.prenom, e.nom, e.sexe, e.discipline, e.naissance, e.age, e.poids, e.ceinture, e.adresse, e.codePostal, e.telephone, e.email, e.commentaires]
+    csv += [e.prenom, e.nom, e.sexe, e.discipline, e.categorie, e.naissance, e.age, e.poids, e.ceinture, e.adresse, e.codePostal, e.telephone, e.email, e.commentaires]
       .map(escCSV).join(';') + '\n';
   });
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
