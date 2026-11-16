@@ -523,12 +523,17 @@
             </select>
           </div>
           <div class="form-group">
-            <label>Type de cours</label>
-            <select id="typeCours">
-              <option>Judo</option>
-              <option>Jujitsu</option>
-              <option>Takeda</option>
-              <option>Mixte</option>
+            <label>Catégorie d'âge</label>
+            <select id="selectCategorieCours" onchange="renderPresenceLists()">
+              <option value="">Toutes les catégories</option>
+              <option value="Mini-Poussin">Mini-Poussin (4-5 ans)</option>
+              <option value="Poussin">Poussin (6-7 ans)</option>
+              <option value="Pupille">Pupille (8-9 ans)</option>
+              <option value="Minime">Minime (10-11 ans)</option>
+              <option value="Cadet">Cadet (12-14 ans)</option>
+              <option value="Junior">Junior (15-17 ans)</option>
+              <option value="Senior">Senior (18-34 ans)</option>
+              <option value="Vétéran">Vétéran (35 ans et +)</option>
             </select>
           </div>
         </div>
@@ -1184,12 +1189,18 @@ function renderDashboardStats() {
   container.innerHTML = html;
 }
 
-function buildPresenceList(containerId, disciplineFilter) {
+function buildPresenceList(containerId, disciplineFilter, categorieFilter) {
   const container = document.getElementById(containerId);
-  const elevesFiltres = eleves.filter(e => e.discipline === disciplineFilter);
+  
+  // On filtre par discipline ET par catégorie d'âge (si une catégorie est sélectionnée)
+  const elevesFiltres = eleves.filter(e => {
+    const matchDiscipline = e.discipline === disciplineFilter;
+    const matchCategorie = !categorieFilter || e.categorie === categorieFilter;
+    return matchDiscipline && matchCategorie;
+  });
   
   if (elevesFiltres.length === 0) {
-    container.innerHTML = `<div class="empty">Aucun élève inscrit en ${disciplineFilter}.</div>`;
+    container.innerHTML = `<div class="empty">Aucun élève trouvé pour ces critères.</div>`;
     return;
   }
   
@@ -1213,10 +1224,13 @@ function buildPresenceList(containerId, disciplineFilter) {
 
 function renderPresenceLists() {
   const discCours = document.getElementById('selectDisciplineCours') ? document.getElementById('selectDisciplineCours').value : 'Judo';
+  const catCours = document.getElementById('selectCategorieCours') ? document.getElementById('selectCategorieCours').value : '';
+  
+  // Pour les compétitions, on garde juste la discipline
   const discCompet = document.getElementById('selectDisciplineCompet') ? document.getElementById('selectDisciplineCompet').value : 'Judo';
   
-  buildPresenceList('presenceList', discCours);
-  buildPresenceList('competList', discCompet);
+  buildPresenceList('presenceList', discCours, catCours);
+  buildPresenceList('competList', discCompet, ''); // Pas de filtre catégorie pour les compétitions
 }
 
 async function savePresence(type) {
@@ -1229,11 +1243,12 @@ async function savePresence(type) {
   });
 
   if (type === 'cours') {
+    const catSelect = document.getElementById('selectCategorieCours').value;
     presencesCours.unshift({
       id: Date.now(),
       date: document.getElementById('dateCours').value,
-      type: document.getElementById('typeCours').value,
       discipline: document.getElementById('selectDisciplineCours').value,
+      categorie: catSelect || 'Toutes',
       eleves: noms,
       enregistrePar: USERS[currentUser].nom
     });
@@ -1269,11 +1284,12 @@ function renderHistoriques() {
     hc.innerHTML = '<div class="empty">Aucun appel de cours enregistré.</div>';
   } else {
     hc.innerHTML = `<table class="mobile-cards"><thead><tr>
-      <th>Date</th><th>Discipline</th><th>Présents</th><th>Par</th><th>Action</th>
+      <th>Date</th><th>Discipline</th><th>Catégorie</th><th>Présents</th><th>Par</th><th>Action</th>
     </tr></thead><tbody>` +
       presencesCours.map(p => `<tr>
         <td data-label="Date">${p.date}</td>
-        <td data-label="Discipline">${esc(p.discipline || p.type)}</td>
+        <td data-label="Discipline">${esc(p.discipline || '-')}</td>
+        <td data-label="Catégorie">${esc(p.categorie || 'Toutes')}</td>
         <td data-label="Présents">${p.eleves.length} : ${p.eleves.map(esc).join(', ')}</td>
         <td data-label="Par">${esc(p.enregistrePar)}</td>
         <td data-label="Action"><button class="btn btn-danger btn-sm" onclick="delPresence('cours', ${p.id})">🗑️</button></td>
