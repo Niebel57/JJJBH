@@ -239,6 +239,169 @@
 
   /* ============ RESPONSIVE DESIGN (ADAPTATION ÉCRANS) ============ */
 
+
+  /* ============ VUE ÉTIQUETTES & IMPRESSION ============ */
+  .etiquettes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px;
+    margin-top: 16px;
+  }
+  .etiquette-card {
+    background: rgba(17, 24, 39, 0.85);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 12px;
+    position: relative;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  }
+  .etiquette-card:hover {
+    border-color: rgba(59, 130, 246, 0.5);
+    transform: translateY(-2px);
+    background: rgba(31, 41, 55, 0.9);
+  }
+  .etiquette-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    padding-bottom: 10px;
+  }
+  .etiquette-name {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-main);
+    line-height: 1.2;
+  }
+  .etiquette-sub {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 4px;
+  }
+  .etiquette-body {
+    font-size: 13px;
+    color: var(--text-main);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .etiquette-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+  }
+  .etiquette-label {
+    color: var(--text-muted);
+    font-size: 12px;
+  }
+  .etiquette-notes {
+    font-size: 12px;
+    color: #93c5fd;
+    background: rgba(59, 130, 246, 0.1);
+    padding: 6px 10px;
+    border-radius: 6px;
+    border-left: 2px solid var(--primary);
+    margin-top: 4px;
+  }
+  .etiquette-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+  }
+  .view-toggle-group {
+    display: inline-flex;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 3px;
+  }
+  .view-toggle-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    padding: 8px 14px;
+    border-radius: 7px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+  }
+  .view-toggle-btn.active {
+    background: var(--primary);
+    color: white;
+    box-shadow: 0 2px 10px var(--primary-glow);
+  }
+
+  @media print {
+    body {
+      background: white !important;
+      color: black !important;
+      background-image: none !important;
+    }
+    header, .back-btn, .stats, .toolbar, .info-note, #eleves > .card:first-of-type, .etiquette-footer, .no-print {
+      display: none !important;
+    }
+    main {
+      padding: 0 !important;
+      max-width: 100% !important;
+    }
+    .card {
+      background: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+      padding: 0 !important;
+      margin: 0 !important;
+    }
+    .card h2 {
+      color: black !important;
+      font-size: 18px !important;
+      margin-bottom: 12px !important;
+    }
+    .etiquettes-grid {
+      display: grid !important;
+      grid-template-columns: repeat(2, 1fr) !important;
+      gap: 12px !important;
+    }
+    .etiquette-card {
+      background: white !important;
+      color: black !important;
+      border: 1.5px solid #333 !important;
+      box-shadow: none !important;
+      page-break-inside: avoid;
+      break-inside: avoid;
+      padding: 12px !important;
+    }
+    .etiquette-name, .etiquette-body, .etiquette-row span {
+      color: black !important;
+    }
+    .etiquette-sub, .etiquette-label {
+      color: #444 !important;
+    }
+    .etiquette-header {
+      border-bottom: 1px solid #ccc !important;
+    }
+    .etiquette-notes {
+      background: #f3f4f6 !important;
+      color: #111 !important;
+      border-left: 2px solid #333 !important;
+    }
+    .badge {
+      border: 1px solid #333 !important;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+  }
+
   @media (max-width: 1024px) {
     main { padding: 24px 16px; }
     .dashboard-grid { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
@@ -655,7 +818,13 @@
       <div class="stats" id="stats"></div>
 
       <div class="card">
-        <h2>📋 Liste des élèves</h2>
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:20px;">
+          <h2 style="margin-bottom:0;">📋 Liste des élèves</h2>
+          <div class="view-toggle-group no-print">
+            <button type="button" class="view-toggle-btn active" id="btnViewTableau" onclick="setElevesView('tableau')">📊 Tableau</button>
+            <button type="button" class="view-toggle-btn" id="btnViewEtiquettes" onclick="setElevesView('etiquettes')">🏷️ Étiquettes</button>
+          </div>
+        </div>
         <div class="toolbar">
           <select class="search-bar" id="filterDiscipline" onchange="renderEleves()" style="max-width:200px; flex:none;">
             <option value="">Toutes les disciplines</option>
@@ -664,6 +833,7 @@
             <option value="Takeda">Takeda</option>
           </select>
           <input type="text" class="search-bar" id="searchEleve" placeholder="🔍 Rechercher un élève..." oninput="renderEleves()">
+          <button class="btn" id="btnPrintEtiquettes" style="display:none; background:rgba(59,130,246,0.2);color:#93c5fd;border:1px solid rgba(59,130,246,0.4);" onclick="printEtiquettes()">🖨️ Imprimer les étiquettes</button>
           <button class="btn" style="background:rgba(255,255,255,0.1);color:white;border:1px solid var(--border);" onclick="document.getElementById('csvFile').click()">📥 Importer CSV</button>
           <button class="btn" style="background:rgba(255,255,255,0.05);color:var(--text-muted);border:1px solid var(--border);" onclick="downloadCSVTemplate()">📄 Modèle</button>
           <button class="btn" style="background:rgba(255,255,255,0.05);color:var(--text-muted);border:1px solid var(--border);" onclick="exportCSV()">📤 Exporter</button>
@@ -927,6 +1097,21 @@ let syncInProgress = false;
 let realtimeChannel = null;
 let pendingImport = null;
 let editingEleveId = null;
+let elevesViewMode = 'tableau';
+
+function setElevesView(mode) {
+  elevesViewMode = mode;
+  document.getElementById('btnViewTableau').classList.toggle('active', mode === 'tableau');
+  document.getElementById('btnViewEtiquettes').classList.toggle('active', mode === 'etiquettes');
+  const printBtn = document.getElementById('btnPrintEtiquettes');
+  if (printBtn) printBtn.style.display = mode === 'etiquettes' ? 'inline-flex' : 'none';
+  renderEleves();
+}
+
+function printEtiquettes() {
+  if (elevesViewMode !== 'etiquettes') setElevesView('etiquettes');
+  window.print();
+}
 
 function getCategorieAge(anneeNaissance) {
   if (!anneeNaissance || isNaN(anneeNaissance)) return '';
@@ -1353,6 +1538,41 @@ function renderEleves() {
     return;
   }
   
+  if (elevesViewMode === 'etiquettes') {
+    let html = '<div class="etiquettes-grid">';
+    filtered.forEach(e => {
+      const sexeIcon = e.sexe === 'Homme' ? '♂️' : e.sexe === 'Femme' ? '♀️' : '';
+      const adresse = [e.adresse ? esc(e.adresse) : '', e.codePostal ? esc(e.codePostal) : '', e.ville ? esc(e.ville) : ''].filter(Boolean).join(' ');
+      const infosAge = [e.naissance ? esc(e.naissance) : '', e.age ? esc(e.age) + ' ans' : '', e.poids ? esc(e.poids) + ' kg' : ''].filter(Boolean).join(' • ');
+
+      html += `<div class="etiquette-card">
+        <div>
+          <div class="etiquette-header">
+            <div>
+              <div class="etiquette-name">${sexeIcon} ${esc(e.prenom)} ${esc(e.nom).toUpperCase()}</div>
+              <div class="etiquette-sub">${esc(e.discipline || 'Judo')}${e.categorie ? ' — ' + esc(e.categorie) : ''}</div>
+            </div>
+            <span class="badge ${ceintureClass(e.ceinture)}">${esc(e.ceinture)}</span>
+          </div>
+          <div class="etiquette-body" style="margin-top:10px;">
+            ${infosAge ? `<div class="etiquette-row"><span class="etiquette-label">Profil :</span><span>${infosAge}</span></div>` : ''}
+            ${e.telephone ? `<div class="etiquette-row"><span class="etiquette-label">Tél :</span><span>📞 ${esc(e.telephone)}</span></div>` : ''}
+            ${e.email ? `<div class="etiquette-row"><span class="etiquette-label">Email :</span><span style="word-break:break-all;">✉️ ${esc(e.email)}</span></div>` : ''}
+            ${adresse ? `<div class="etiquette-row"><span class="etiquette-label">Adresse :</span><span style="text-align:right;">📍 ${adresse}</span></div>` : ''}
+            ${e.commentaires ? `<div class="etiquette-notes">📝 ${esc(e.commentaires)}</div>` : ''}
+          </div>
+        </div>
+        <div class="etiquette-footer">
+          <button class="btn btn-sm" style="background:rgba(255,255,255,0.1);color:white;border:1px solid var(--border);" onclick="editEleve(${e.id})" title="Modifier">✏️ Modifier</button>
+          <button class="btn btn-sm" style="background:rgba(239,68,68,0.15);color:#fca5a5;border:1px solid rgba(239,68,68,0.3);" onclick="deleteEleve(${e.id})" title="Supprimer">🗑️</button>
+        </div>
+      </div>`;
+    });
+    html += '</div>';
+    div.innerHTML = html;
+    return;
+  }
+
   let html = `<table class="mobile-cards"><thead><tr>
     <th>Prénom</th><th>Nom</th><th>Sexe</th><th>Discipline</th><th>Catégorie</th><th>Naissance</th><th>Âge</th>
     <th>Poids</th><th>Ceinture</th><th>Contact</th><th>Adresse</th><th>Commentaires</th><th>Actions</th>
