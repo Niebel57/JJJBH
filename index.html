@@ -26,6 +26,7 @@
     --border-focus: rgba(59, 130, 246, 0.5);
     --success: #10b981;
     --danger: #ef4444;
+    --warning: #f59e0b;
     --radius: 16px;
     --radius-sm: 10px;
     --shadow-lg: 0 10px 40px -10px rgba(0,0,0,0.7);
@@ -141,6 +142,7 @@
   .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2); }
   .form-group textarea { resize: vertical; min-height: 70px; }
   .form-group select option { background: var(--bg-base); color: var(--text-main); }
+  .form-group .hint { font-size: 11px; color: var(--text-muted); margin-top: 4px; display: block; }
 
   .btn { padding: 12px 24px; border: none; border-radius: var(--radius-sm); cursor: pointer; font-size: 14px; font-weight: 600; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-family: inherit; }
   .btn:active { transform: scale(0.98); }
@@ -237,19 +239,16 @@
 
   /* ============ RESPONSIVE DESIGN (ADAPTATION ÉCRANS) ============ */
 
-  /* Tablettes (max 1024px) */
   @media (max-width: 1024px) {
     main { padding: 24px 16px; }
     .dashboard-grid { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
     .stat-card .number { font-size: 26px; }
   }
 
-  /* Mobiles et petites tablettes (max 768px) */
   @media (max-width: 768px) {
     body { font-size: 14px; }
     main { padding: 16px 12px; }
     
-    /* En-tête */
     header { padding: 12px 16px; }
     header .brand { font-size: 15px; gap: 8px; }
     header .brand-logo { width: 32px; height: 32px; }
@@ -257,21 +256,17 @@
     header .sync-indicator { padding: 4px 8px; font-size: 11px; }
     header .logout-btn { padding: 6px 12px; font-size: 12px; }
     
-    /* Cartes */
     .card { padding: 16px; border-radius: 12px; margin-bottom: 16px; }
     .card h2 { font-size: 16px; margin-bottom: 14px; }
     
-    /* Formulaires */
     .form-row { flex-direction: column; gap: 10px; }
     .form-group { min-width: 100%; }
     .form-group input, .form-group select, .form-group textarea { font-size: 16px; padding: 12px; }
     
-    /* Toolbar */
     .toolbar { flex-direction: column; gap: 10px; }
     .toolbar .search-bar { min-width: 100%; }
     .toolbar .btn { width: 100%; padding: 12px; }
     
-    /* Dashboard */
     .dashboard-header { margin: 20px 0 24px; }
     .dashboard-header h1 { font-size: 24px; }
     .dashboard-grid { grid-template-columns: 1fr; gap: 12px; }
@@ -279,21 +274,17 @@
     .dashboard-icon { width: 60px; height: 60px; font-size: 30px; }
     .dashboard-card h2 { font-size: 18px; }
     
-    /* Stats */
     .stats { grid-template-columns: repeat(2, 1fr); gap: 10px; }
     .stat-card { padding: 14px; }
     .stat-card .number { font-size: 22px; }
     
-    /* Présences */
     .presence-list { grid-template-columns: 1fr; }
     .presence-item { padding: 14px; }
     
-    /* Modales */
     .modal-box { padding: 20px; }
     .modal-actions { flex-direction: column; }
     .modal-actions .btn { width: 100%; }
     
-    /* TABLEAUX -> CARTES SUR MOBILE */
     table.mobile-cards, table.mobile-cards thead, table.mobile-cards tbody, table.mobile-cards tr, table.mobile-cards td { display: block; width: 100%; }
     table.mobile-cards thead { display: none; }
     table.mobile-cards tr { 
@@ -313,11 +304,10 @@
     }
   }
 
-  /* Très petits écrans (max 400px) */
   @media (max-width: 400px) {
     .stats { grid-template-columns: 1fr; }
     .dashboard-header h1 { font-size: 20px; }
-    header .brand span { display: none; } /* Cache le texte, garde juste le logo */
+    header .brand span { display: none; }
   }
 </style>
 </head>
@@ -384,6 +374,188 @@
           <div class="dashboard-icon">🏆</div>
           <h2>Compétitions</h2>
           <p>Gérer les sélections et les appels pour les tournois.</p>
+        </div>
+        <div class="dashboard-card" onclick="showTab('inscription')">
+          <div class="dashboard-icon">📝</div>
+          <h2>Inscription Licence</h2>
+          <p>Prendre une licence (FFJDA) et régler la cotisation annuelle.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ONGLET INSCRIPTION LICENCE -->
+    <div id="inscription" class="tab">
+      <button class="back-btn" onclick="showTab('accueil')">← Retour à l'accueil</button>
+      
+      <div class="card">
+        <h2>📝 Formulaire d'inscription Licence & Cotisation</h2>
+        
+        <div class="info-note" style="margin-bottom: 24px;">
+          <strong>Tarifs saison 2026-2027 :</strong><br>
+          Licence FFJDA (assurance incluse) : <strong>46 €</strong><br>
+          Cotisation annuelle club : <strong>105 €</strong><br>
+          <strong>Total à régler : 151 €</strong>
+          <br><br>
+          <small>La licence FFJDA est obligatoire pour pratiquer. Elle sera commandée par le club après validation du dossier et réception du paiement.</small>
+        </div>
+
+        <div id="inscriptionForm">
+          <h3 style="font-size: 16px; margin-bottom: 16px; color: var(--text-main);">Informations du licencié</h3>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label>Nom *</label>
+              <input type="text" id="insNom" placeholder="Nom de famille">
+            </div>
+            <div class="form-group">
+              <label>Prénom *</label>
+              <input type="text" id="insPrenom" placeholder="Prénom">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Sexe *</label>
+              <select id="insSexe">
+                <option value="">-- Choisir --</option>
+                <option value="Homme">Homme</option>
+                <option value="Femme">Femme</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Date de naissance *</label>
+              <input type="date" id="insNaissance">
+            </div>
+            <div class="form-group">
+              <label>Lieu de naissance *</label>
+              <input type="text" id="insLieuNaissance" placeholder="Ville">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Discipline *</label>
+              <select id="insDiscipline">
+                <option value="Judo">Judo</option>
+                <option value="Jujitsu">Jujitsu</option>
+                <option value="Takeda">Takeda</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Catégorie d'âge</label>
+              <select id="insCategorie">
+                <option value="">-- Calculée automatiquement --</option>
+                <option value="Éveils Judo / Baby judo">Éveils Judo / Baby judo (2022-2021, 4-5 ans)</option>
+                <option value="Poussinets / Mini-poussins">Poussinets / Mini-poussins (2020-2019, 6-7 ans)</option>
+                <option value="Poussins">Poussins (2018-2017, 8-9 ans)</option>
+                <option value="Benjamins">Benjamins (2016-2015, 10-11 ans)</option>
+                <option value="Minimes">Minimes (2014-2013, 12-13 ans)</option>
+                <option value="Cadets">Cadets (2012-2011-2010, 14-16 ans)</option>
+                <option value="Juniors">Juniors (2009-2008-2007, 17-19 ans)</option>
+                <option value="Seniors">Seniors (2006 et avant, 20 ans et +)</option>
+                <option value="Vétérans">Vétérans (1997 et avant, 30 ans et +)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Ceinture actuelle</label>
+              <select id="insCeinture"></select>
+            </div>
+          </div>
+
+          <h3 style="font-size: 16px; margin: 24px 0 16px; color: var(--text-main);">Coordonnées</h3>
+
+          <div class="form-row">
+            <div class="form-group" style="flex: 2;">
+              <label>Adresse (N° et rue) *</label>
+              <input type="text" id="insAdresse" placeholder="N° et nom de rue">
+            </div>
+            <div class="form-group" style="max-width: 150px;">
+              <label>Code postal *</label>
+              <input type="text" id="insCodePostal" placeholder="57970" maxlength="10">
+            </div>
+            <div class="form-group">
+              <label>Ville *</label>
+              <input type="text" id="insVille" placeholder="Basse-Ham">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Téléphone *</label>
+              <input type="tel" id="insTelephone" placeholder="06 12 34 56 78">
+            </div>
+            <div class="form-group">
+              <label>Email *</label>
+              <input type="email" id="insEmail" placeholder="nom@exemple.fr">
+              <span class="hint">Obligatoire pour la prise de licence FFJDA</span>
+            </div>
+          </div>
+
+          <h3 style="font-size: 16px; margin: 24px 0 16px; color: var(--text-main);">Représentant légal (si mineur)</h3>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Nom du représentant</label>
+              <input type="text" id="insRepNom" placeholder="Nom du parent">
+            </div>
+            <div class="form-group">
+              <label>Prénom du représentant</label>
+              <input type="text" id="insRepPrenom" placeholder="Prénom du parent">
+            </div>
+            <div class="form-group">
+              <label>Téléphone du représentant</label>
+              <input type="tel" id="insRepTelephone" placeholder="06 12 34 56 78">
+            </div>
+          </div>
+
+          <h3 style="font-size: 16px; margin: 24px 0 16px; color: var(--text-main);">Documents & Autorisations</h3>
+
+          <div class="form-group" style="margin-bottom: 16px;">
+            <label style="display: flex; align-items: flex-start; gap: 10px; font-size: 13px; color: var(--text-main); text-transform: none; font-weight: 400;">
+              <input type="checkbox" id="insCertificat" style="width: auto; margin-top: 3px;">
+              <span>Je certifie avoir fourni un certificat médical de non contre-indication à la pratique du Judo/Jujitsu/Takeda (ou une attestation QS-Sport si toutes les réponses au questionnaire de santé sont négatives).</span>
+            </label>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 16px;">
+            <label style="display: flex; align-items: flex-start; gap: 10px; font-size: 13px; color: var(--text-main); text-transform: none; font-weight: 400;">
+              <input type="checkbox" id="insReglement" style="width: auto; margin-top: 3px;">
+              <span>Je déclare avoir lu et accepté le règlement intérieur du club.</span>
+            </label>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 16px;">
+            <label style="display: flex; align-items: flex-start; gap: 10px; font-size: 13px; color: var(--text-main); text-transform: none; font-weight: 400;">
+              <input type="checkbox" id="insPhoto" style="width: auto; margin-top: 3px;">
+              <span>J'autorise le club à prendre et publier des photos de moi/mon enfant dans le cadre des activités du club.</span>
+            </label>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 24px;">
+            <label>Commentaires / Informations médicales</label>
+            <textarea id="insCommentaires" placeholder="Allergies, asthme, traitements en cours, etc."></textarea>
+          </div>
+
+          <div style="display: flex; gap: 16px; flex-wrap: wrap; margin-top: 24px;">
+            <button class="btn btn-primary" onclick="validerInscription()" style="flex: 2; min-width: 200px;">
+              ✅ Valider l'inscription (151 €)
+            </button>
+            <button class="btn" style="background: rgba(255,255,255,0.1); color: var(--text-main); border: 1px solid var(--border); flex: 1; min-width: 150px;" onclick="reinitialiserInscription()">
+              Effacer
+            </button>
+          </div>
+        </div>
+
+        <div id="inscriptionSuccess" style="display: none; text-align: center; padding: 40px 20px;">
+          <div style="font-size: 60px; margin-bottom: 20px;">✅</div>
+          <h3 style="color: var(--success); margin-bottom: 12px; font-size: 20px;">Inscription enregistrée !</h3>
+          <p style="color: var(--text-muted); margin-bottom: 24px;">
+            Le dossier de <strong id="successNom"></strong> a bien été pris en compte.<br>
+            Le club va maintenant procéder à la commande de la licence FFJDA.<br><br>
+            <strong>Montant à régler : 151 €</strong><br>
+            (46 € licence + 105 € cotisation)
+          </p>
+          <button class="btn btn-primary" onclick="showTab('accueil')">Retour à l'accueil</button>
         </div>
       </div>
     </div>
@@ -756,44 +928,22 @@ let realtimeChannel = null;
 let pendingImport = null;
 let editingEleveId = null;
 
-// NOUVELLE FONCTION BASÉE SUR L'ANNÉE DE NAISSANCE
 function getCategorieAge(anneeNaissance) {
   if (!anneeNaissance || isNaN(anneeNaissance)) return '';
-  
-  // Vétérans : 1997 et avant (30 ans et plus)
   if (anneeNaissance <= 1997) return 'Vétérans';
-  
-  // Seniors : 2006 et avant (20 ans et plus)
   if (anneeNaissance <= 2006) return 'Seniors';
-  
-  // Juniors : 2009 - 2008 - 2007
   if (anneeNaissance >= 2007 && anneeNaissance <= 2009) return 'Juniors';
-  
-  // Cadets : 2012 - 2011 - 2010
   if (anneeNaissance >= 2010 && anneeNaissance <= 2012) return 'Cadets';
-  
-  // Minimes : 2014 - 2013
   if (anneeNaissance >= 2013 && anneeNaissance <= 2014) return 'Minimes';
-  
-  // Benjamins : 2016 - 2015
   if (anneeNaissance >= 2015 && anneeNaissance <= 2016) return 'Benjamins';
-  
-  // Poussins : 2018 - 2017
   if (anneeNaissance >= 2017 && anneeNaissance <= 2018) return 'Poussins';
-  
-  // Poussinets / Mini-poussins : 2020 - 2019
   if (anneeNaissance >= 2019 && anneeNaissance <= 2020) return 'Poussinets / Mini-poussins';
-  
-  // Éveils Judo / Baby judo : 2022 - 2021
   if (anneeNaissance >= 2021 && anneeNaissance <= 2022) return 'Éveils Judo / Baby judo';
-  
   return '';
 }
 
-// Mise à jour automatique
 function updateCategorieFromAge(inputAgeId, inputCatId) {
-  // On récupère la date de naissance si elle existe, sinon on utilise l'âge
-  const dateNaissanceInput = inputAgeId === 'age' ? 'naissance' : 'editNaissance';
+  const dateNaissanceInput = inputAgeId === 'age' ? 'naissance' : (inputAgeId === 'insAge' ? 'insNaissance' : 'editNaissance');
   const dateVal = document.getElementById(dateNaissanceInput)?.value;
   
   let anneeNaissance;
@@ -802,14 +952,101 @@ function updateCategorieFromAge(inputAgeId, inputCatId) {
   } else {
     const age = parseInt(document.getElementById(inputAgeId).value);
     if (isNaN(age)) return;
-    const today = new Date();
-    anneeNaissance = today.getFullYear() - age;
+    anneeNaissance = new Date().getFullYear() - age;
   }
   
   const cat = getCategorieAge(anneeNaissance);
   if (cat) document.getElementById(inputCatId).value = cat;
 }
 
+// ============ INSCRIPTION ============
+function calcAgeInscription() {
+  const d = document.getElementById('insNaissance').value;
+  if (!d) return;
+  const birth = new Date(d);
+  const today = new Date();
+  let age = today.getFullYear() - birth.getFullYear();
+  const m = today.getMonth() - birth.getMonth();
+  if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) age--;
+  
+  const cat = getCategorieAge(birth.getFullYear());
+  if (cat) document.getElementById('insCategorie').value = cat;
+}
+
+async function validerInscription() {
+  const nom = document.getElementById('insNom').value.trim();
+  const prenom = document.getElementById('insPrenom').value.trim();
+  const sexe = document.getElementById('insSexe').value;
+  const naissance = document.getElementById('insNaissance').value;
+  const lieuNaissance = document.getElementById('insLieuNaissance').value.trim();
+  const discipline = document.getElementById('insDiscipline').value;
+  const adresse = document.getElementById('insAdresse').value.trim();
+  const codePostal = document.getElementById('insCodePostal').value.trim();
+  const ville = document.getElementById('insVille').value.trim();
+  const telephone = document.getElementById('insTelephone').value.trim();
+  const email = document.getElementById('insEmail').value.trim();
+  const certificat = document.getElementById('insCertificat').checked;
+  const reglement = document.getElementById('insReglement').checked;
+
+  if (!nom || !prenom || !sexe || !naissance || !adresse || !codePostal || !ville || !telephone || !email) {
+    alert("Veuillez remplir tous les champs obligatoires (*).");
+    return;
+  }
+  if (!certificat) {
+    alert("Veuillez certifier avoir fourni un certificat médical ou une attestation QS-Sport.");
+    return;
+  }
+  if (!reglement) {
+    alert("Veuillez accepter le règlement intérieur du club.");
+    return;
+  }
+
+  const nouvelEleve = {
+    id: Date.now(),
+    prenom, nom, sexe,
+    discipline,
+    naissance,
+    age: new Date().getFullYear() - new Date(naissance).getFullYear(),
+    categorie: document.getElementById('insCategorie').value,
+    poids: '',
+    ceinture: document.getElementById('insCeinture').value || 'Blanche',
+    adresse,
+    codePostal,
+    ville,
+    telephone,
+    email,
+    commentaires: document.getElementById('insCommentaires').value.trim(),
+    dateInscription: new Date().toISOString().split('T')[0],
+    licencePayee: false,
+    cotisationPayee: false
+  };
+
+  eleves.push(nouvelEleve);
+  await save();
+  
+  document.getElementById('successNom').textContent = `${prenom} ${nom}`;
+  document.getElementById('inscriptionForm').style.display = 'none';
+  document.getElementById('inscriptionSuccess').style.display = 'block';
+  renderAll();
+}
+
+function reinitialiserInscription() {
+  if (!confirm("Effacer tous les champs du formulaire ?")) return;
+  ['insNom','insPrenom','insLieuNaissance','insAdresse','insCodePostal','insVille','insTelephone','insEmail','insRepNom','insRepPrenom','insRepTelephone','insCommentaires'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  document.getElementById('insSexe').value = '';
+  document.getElementById('insNaissance').value = '';
+  document.getElementById('insCategorie').value = '';
+  document.getElementById('insCertificat').checked = false;
+  document.getElementById('insReglement').checked = false;
+  document.getElementById('insPhoto').checked = false;
+  document.getElementById('inscriptionForm').style.display = 'block';
+  document.getElementById('inscriptionSuccess').style.display = 'none';
+}
+
+// ============ RESTE DU CODE (INCHANGÉ) ============
 async function loadFromCloud() {
   setCloudStatus('syncing', 'Chargement...');
   try {
@@ -943,6 +1180,8 @@ function initApp() {
   sel.innerHTML = CEINTURES.map(c => `<option value="${c}">${c}</option>`).join('');
   const selEdit = document.getElementById('editCeinture');
   selEdit.innerHTML = CEINTURES.map(c => `<option value="${c}">${c}</option>`).join('');
+  const selIns = document.getElementById('insCeinture');
+  if (selIns) selIns.innerHTML = '<option value="Blanche">Blanche</option>' + CEINTURES.map(c => `<option value="${c}">${c}</option>`).join('');
   renderAll();
   showTab('accueil');
 }
@@ -952,7 +1191,7 @@ function renderAll() {
   renderStats();
   renderPresenceLists();
   renderHistoriques();
-  renderDashboardStats(); // <-- Mise à jour des stats d'accueil
+  renderDashboardStats();
 }
 
 function showTab(id) {
@@ -972,8 +1211,6 @@ function calcAge() {
   if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) age--;
   
   document.getElementById('age').value = age;
-  
-  // Auto-remplissage de la catégorie
   const cat = getCategorieAge(birth.getFullYear());
   if (cat) document.getElementById('categorie').value = cat;
 }
@@ -1058,8 +1295,6 @@ function calcEditAge() {
   if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) age--;
   
   document.getElementById('editAge').value = age;
-  
-  // Auto-remplissage de la catégorie
   const cat = getCategorieAge(birth.getFullYear());
   if (cat) document.getElementById('editCategorie').value = cat;
 }
@@ -1169,7 +1404,6 @@ function renderStats() {
   `;
 }
 
-// FONCTION POUR LES STATS DE L'ACCUEIL
 function renderDashboardStats() {
   const container = document.getElementById('dashboardStats');
   if (!container) return;
@@ -1226,7 +1460,6 @@ function renderDashboardStats() {
 function buildPresenceList(containerId, disciplineFilter, categorieFilter) {
   const container = document.getElementById(containerId);
   
-  // On filtre par discipline ET par catégorie d'âge (si une catégorie est sélectionnée)
   const elevesFiltres = eleves.filter(e => {
     const matchDiscipline = e.discipline === disciplineFilter;
     const matchCategorie = !categorieFilter || e.categorie === categorieFilter;
@@ -1259,12 +1492,10 @@ function buildPresenceList(containerId, disciplineFilter, categorieFilter) {
 function renderPresenceLists() {
   const discCours = document.getElementById('selectDisciplineCours') ? document.getElementById('selectDisciplineCours').value : 'Judo';
   const catCours = document.getElementById('selectCategorieCours') ? document.getElementById('selectCategorieCours').value : '';
-  
-  // Pour les compétitions, on garde juste la discipline
   const discCompet = document.getElementById('selectDisciplineCompet') ? document.getElementById('selectDisciplineCompet').value : 'Judo';
   
   buildPresenceList('presenceList', discCours, catCours);
-  buildPresenceList('competList', discCompet, ''); // Pas de filtre catégorie pour les compétitions
+  buildPresenceList('competList', discCompet, '');
 }
 
 async function savePresence(type) {
@@ -1464,7 +1695,6 @@ function importCSV(event) {
         age = a;
       }
       
-      // Auto-catégorie si vide
       if (!categorie && naissance) {
         categorie = getCategorieAge(new Date(naissance).getFullYear());
       }
